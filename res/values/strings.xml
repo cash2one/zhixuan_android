@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">股票开户宝</string>
+    <string name="action_settings">+</string>
+    <string name="action_location">成都</string>
+    <string name="action_other">其他</string>
+    <string name="loadingTips">数据加载中...</string>
+
+</resources>

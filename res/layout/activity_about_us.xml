@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="15dp" >
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="股票开户通是一个股票开户平台，这里有全国300多个城市的的数千名认证的客户经理为需要股票开户的朋友提供咨询和指导服务；"
+        android:textSize="16sp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="投资是门学问，要善学善问，股票开户后我们还提供了一个授业解惑的平台，最新的财经资讯、最酷的问答一手掌握，欢迎访问理财问答社区「智选」，网址：http://zhixuan.com，后续app也即将推出，敬请期待"
+        android:textSize="16sp" >
+    </TextView>
+
+</LinearLayout>
