@@ -45,234 +45,234 @@ import com.zhixuan.utils.ZXSharedPreferences;
 
 public class CustomManagerFragment extends Fragment {
 
-	private PullToRefreshListView mPullRefreshListView;
-	private CustomManagerListViewAdapter myAdapter;
-	private ListView actualListView;
-	private RequestQueue mQueue;
-	private int currentPageCount = 1;
-	private Dialog loadingDialog;
-	private String cityId;
+    private PullToRefreshListView mPullRefreshListView;
+    private CustomManagerListViewAdapter myAdapter;
+    private ListView actualListView;
+    private RequestQueue mQueue;
+    private int currentPageCount = 1;
+    private Dialog loadingDialog;
+    private String cityId;
 
-	private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			myAdapter.clearAll();
-			GetData(1);
-		}
-	};
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            myAdapter.clearAll();
+            GetData(1);
+        }
+    };
 
-	@Override
-	public void onResume() {
-		super.onResume();
-		// 在当前的activity中注册广播
-		IntentFilter filter = new IntentFilter();
-		filter.addAction(Consts.CHOOSE_CITY_SIGNAL);
-		getActivity().registerReceiver(this.broadcastReceiver, filter);
-	}
+    @Override
+    public void onResume() {
+        super.onResume();
+        // 在当前的activity中注册广播
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Consts.CHOOSE_CITY_SIGNAL);
+        getActivity().registerReceiver(this.broadcastReceiver, filter);
+    }
 
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-		getActivity().unregisterReceiver(this.broadcastReceiver);
-	}
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        getActivity().unregisterReceiver(this.broadcastReceiver);
+    }
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
 
-		mQueue = Volley.newRequestQueue(getActivity());
-		loadingDialog = LoadingDialog.createLoadingDialog(getActivity(),
-				"数据加载中...");
-		currentPageCount = 1;
+        mQueue = Volley.newRequestQueue(getActivity());
+        loadingDialog = LoadingDialog.createLoadingDialog(getActivity(),
+                "数据加载中...");
+        currentPageCount = 1;
 
-		View view = inflater.inflate(R.layout.fragment_custom_manager,
-				container, false);
+        View view = inflater.inflate(R.layout.fragment_custom_manager,
+                container, false);
 
-		// mPullRefreshListView.setMode(com.handmark.pulltorefresh.library.PullToRefreshBase.Mode.BOTH);
-		mPullRefreshListView = (PullToRefreshListView) view
-				.findViewById(R.id.pull_refresh_cm_list);
+        // mPullRefreshListView.setMode(com.handmark.pulltorefresh.library.PullToRefreshBase.Mode.BOTH);
+        mPullRefreshListView = (PullToRefreshListView) view
+                .findViewById(R.id.pull_refresh_cm_list);
 
-		mPullRefreshListView
-				.setOnRefreshListener(new OnRefreshListener<ListView>() {
-					@Override
-					public void onRefresh(
-							PullToRefreshBase<ListView> refreshView) {
-						String label = DateUtils.formatDateTime(getActivity(),
-								System.currentTimeMillis(),
-								DateUtils.FORMAT_SHOW_TIME
-										| DateUtils.FORMAT_SHOW_DATE
-										| DateUtils.FORMAT_ABBREV_ALL);
+        mPullRefreshListView
+                .setOnRefreshListener(new OnRefreshListener<ListView>() {
+                    @Override
+                    public void onRefresh(
+                            PullToRefreshBase<ListView> refreshView) {
+                        String label = DateUtils.formatDateTime(getActivity(),
+                                System.currentTimeMillis(),
+                                DateUtils.FORMAT_SHOW_TIME
+                                        | DateUtils.FORMAT_SHOW_DATE
+                                        | DateUtils.FORMAT_ABBREV_ALL);
 
-						// Update the LastUpdatedLabel
-						refreshView.getLoadingLayoutProxy()
-								.setLastUpdatedLabel(label);
+                        // Update the LastUpdatedLabel
+                        refreshView.getLoadingLayoutProxy()
+                                .setLastUpdatedLabel(label);
 
-						// Do work to refresh the list here.
-						myAdapter.clearAll();
-						GetData(1);
-					}
-				});
+                        // Do work to refresh the list here.
+                        myAdapter.clearAll();
+                        GetData(1);
+                    }
+                });
 
-		mPullRefreshListView
-				.setOnLastItemVisibleListener(new OnLastItemVisibleListener() {
+        mPullRefreshListView
+                .setOnLastItemVisibleListener(new OnLastItemVisibleListener() {
 
-					@Override
-					public void onLastItemVisible() {
-						currentPageCount += 1;
-						GetData(currentPageCount);
-					}
-				});
+                    @Override
+                    public void onLastItemVisible() {
+                        currentPageCount += 1;
+                        GetData(currentPageCount);
+                    }
+                });
 
-		actualListView = mPullRefreshListView.getRefreshableView();
+        actualListView = mPullRefreshListView.getRefreshableView();
 
-		myAdapter = new CustomManagerListViewAdapter();
-		actualListView.setAdapter(myAdapter);
-		GetData(1);
-		return view;
-	}
+        myAdapter = new CustomManagerListViewAdapter();
+        actualListView.setAdapter(myAdapter);
+        GetData(1);
+        return view;
+    }
 
-	private void GetData(int currentPage) {
+    private void GetData(int currentPage) {
 
-		ZXSharedPreferences mZxSharedPreferences = new ZXSharedPreferences(
-				getActivity());
-		cityId = mZxSharedPreferences.getCityId();
+        ZXSharedPreferences mZxSharedPreferences = new ZXSharedPreferences(
+                getActivity());
+        cityId = mZxSharedPreferences.getCityId();
 
-		loadingDialog.show();
+        loadingDialog.show();
 
-		JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-				Consts.MAIN_DOMAIN + "/kaihu/api_get_custom_manager_list?page="
-						+ currentPage + "&city_id=" + cityId, null,
-				new Response.Listener<JSONObject>() {
-					@Override
-					public void onResponse(JSONObject obj) {
-						// Log.d("TAG", obj.toString());
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                Consts.MAIN_DOMAIN + "/kaihu/api_get_custom_manager_list?page="
+                        + currentPage + "&city_id=" + cityId, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject obj) {
+                        // Log.d("TAG", obj.toString());
 
-						loadingDialog.hide();
+                        loadingDialog.hide();
 
-						try {
+                        try {
 
-							if (obj.getInt("errcode") == 0) {
-								JSONArray customManagers = obj
-										.getJSONArray("custom_managers");
-								for (int i = 0; i < customManagers.length(); i++) {
-									JSONObject customManagerObj = customManagers
-											.getJSONObject(i);
+                            if (obj.getInt("errcode") == 0) {
+                                JSONArray customManagers = obj
+                                        .getJSONArray("custom_managers");
+                                for (int i = 0; i < customManagers.length(); i++) {
+                                    JSONObject customManagerObj = customManagers
+                                            .getJSONObject(i);
 
-									myAdapter.addItem(customManagerObj
-											.getString("id"), customManagerObj
-											.getString("qq"), customManagerObj
-											.getString("nick"),
-											customManagerObj.getString("img"),
-											customManagerObj
-													.getString("mobile"),
-											customManagerObj
-													.getString("vip_info"),
-											customManagerObj
-													.getString("company_name"));
-								}
-							}
-						} catch (JSONException e) {
+                                    myAdapter.addItem(customManagerObj
+                                            .getString("id"), customManagerObj
+                                            .getString("qq"), customManagerObj
+                                            .getString("nick"),
+                                            customManagerObj.getString("img"),
+                                            customManagerObj
+                                                    .getString("mobile"),
+                                            customManagerObj
+                                                    .getString("vip_info"),
+                                            customManagerObj
+                                                    .getString("company_name"));
+                                }
+                            }
+                        } catch (JSONException e) {
 
-						}
+                        }
 
-						myAdapter.notifyDataSetChanged();
+                        myAdapter.notifyDataSetChanged();
 
-						mPullRefreshListView.onRefreshComplete();
+                        mPullRefreshListView.onRefreshComplete();
 
-					}
-				}, new Response.ErrorListener() {
-					@Override
-					public void onErrorResponse(VolleyError error) {
-						Log.e("TAG", error.getMessage(), error);
-						loadingDialog.hide();
-					}
-				});
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("TAG", error.getMessage(), error);
+                        loadingDialog.hide();
+                    }
+                });
 
-		mQueue.add(jsonObjectRequest);
-	}
+        mQueue.add(jsonObjectRequest);
+    }
 
-	public class CustomManagerListViewAdapter extends BaseAdapter {
-		ArrayList<HashMap<String, String>> items;
+    public class CustomManagerListViewAdapter extends BaseAdapter {
+        ArrayList<HashMap<String, String>> items;
 
-		ImageLoader imageLoader;
+        ImageLoader imageLoader;
 
-		public CustomManagerListViewAdapter() {
+        public CustomManagerListViewAdapter() {
 
-			items = new ArrayList<HashMap<String, String>>();
+            items = new ArrayList<HashMap<String, String>>();
 
-			imageLoader = new ImageLoader(mQueue, new BitmapCache());
-		}
+            imageLoader = new ImageLoader(mQueue, new BitmapCache());
+        }
 
-		public void clearAll() {
-			items.clear();
-		}
+        public void clearAll() {
+            items.clear();
+        }
 
-		public int getCount() {
-			return items.size();
-		}
+        public int getCount() {
+            return items.size();
+        }
 
-		public HashMap<String, String> getItem(int position) {
-			return items.get(position);
-		}
+        public HashMap<String, String> getItem(int position) {
+            return items.get(position);
+        }
 
-		public long getItemId(int position) {
-			return position;
-		}
+        public long getItemId(int position) {
+            return position;
+        }
 
-		private View makeItemView(String strName, String strImageUrl,
-				String strCompanyName, String strInfo, String strTel,
-				String strQQ) {
-			LayoutInflater inflater = (LayoutInflater) getActivity()
-					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        private View makeItemView(String strName, String strImageUrl,
+                String strCompanyName, String strInfo, String strTel,
+                String strQQ) {
+            LayoutInflater inflater = (LayoutInflater) getActivity()
+                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-			// 使用View的对象itemView与R.layout.item关联
-			View itemView = inflater
-					.inflate(R.layout.item_custom_manager, null);
+            // 使用View的对象itemView与R.layout.item关联
+            View itemView = inflater
+                    .inflate(R.layout.item_custom_manager, null);
 
-			TextView name = (TextView) itemView.findViewById(R.id.cmName);
-			name.setText(strName);
+            TextView name = (TextView) itemView.findViewById(R.id.cmName);
+            name.setText(strName);
 
-			ImageView image = (ImageView) itemView.findViewById(R.id.cmImage);
-			ImageListener listener = ImageLoader.getImageListener(image,
-					R.drawable.default_person, R.drawable.default_person);
+            ImageView image = (ImageView) itemView.findViewById(R.id.cmImage);
+            ImageListener listener = ImageLoader.getImageListener(image,
+                    R.drawable.default_person, R.drawable.default_person);
 
-			imageLoader.get(strImageUrl, listener);
+            imageLoader.get(strImageUrl, listener);
 
-			TextView info = (TextView) itemView.findViewById(R.id.cmInfo);
-			info.setText(strCompanyName + "     " + strInfo);
-			TextView tel = (TextView) itemView.findViewById(R.id.cmTel);
-			tel.setText("电话   " + strTel);
-			TextView QQ = (TextView) itemView.findViewById(R.id.cmQQ);
-			QQ.setText("QQ  " + strQQ);
+            TextView info = (TextView) itemView.findViewById(R.id.cmInfo);
+            info.setText(strCompanyName + "     " + strInfo);
+            TextView tel = (TextView) itemView.findViewById(R.id.cmTel);
+            tel.setText("电话   " + strTel);
+            TextView QQ = (TextView) itemView.findViewById(R.id.cmQQ);
+            QQ.setText("QQ  " + strQQ);
 
-			return itemView;
-		}
+            return itemView;
+        }
 
-		public void addItem(String strId, String strQQ, String strName,
-				String strImage, String strMobile, String strInfo,
-				String strCompanyName) {
-			HashMap<String, String> temp = new HashMap<String, String>();
-			temp.put("id", strId);
-			temp.put("qq", strQQ);
-			temp.put("name", strName);
-			temp.put("img", strImage);
-			temp.put("mobile", strMobile);
-			temp.put("info", strInfo);
-			temp.put("companyName", strCompanyName);
+        public void addItem(String strId, String strQQ, String strName,
+                String strImage, String strMobile, String strInfo,
+                String strCompanyName) {
+            HashMap<String, String> temp = new HashMap<String, String>();
+            temp.put("id", strId);
+            temp.put("qq", strQQ);
+            temp.put("name", strName);
+            temp.put("img", strImage);
+            temp.put("mobile", strMobile);
+            temp.put("info", strInfo);
+            temp.put("companyName", strCompanyName);
 
-			items.add(temp);
+            items.add(temp);
 
-		}
+        }
 
-		public View getView(int position, View convertView, ViewGroup parent) {
-			// if (convertView == null)
+        public View getView(int position, View convertView, ViewGroup parent) {
+            // if (convertView == null)
 
-			// return convertView;
+            // return convertView;
 
-			HashMap<String, String> temp = items.get(position);
-			return makeItemView(temp.get("name"), temp.get("img"),
-					temp.get("companyName"), temp.get("info"),
-					temp.get("mobile"), temp.get("qq"));
-		}
-	}
+            HashMap<String, String> temp = items.get(position);
+            return makeItemView(temp.get("name"), temp.get("img"),
+                    temp.get("companyName"), temp.get("info"),
+                    temp.get("mobile"), temp.get("qq"));
+        }
+    }
 }

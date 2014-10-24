@@ -49,282 +49,282 @@ import com.zhixuan.utils.ZXSharedPreferences;
 
 public class DepartmentFragment extends Fragment {
 
-	private PullToRefreshListView mPullRefreshListView;
-	private DepartmentListViewAdapter myAdapter;
-	private ListView actualListView;
-	private RequestQueue mQueue;
-	private boolean getLastest = false;
-	private int currentPageCount = 1;
-	private Dialog loadingDialog;
-	private String cityId;
+    private PullToRefreshListView mPullRefreshListView;
+    private DepartmentListViewAdapter myAdapter;
+    private ListView actualListView;
+    private RequestQueue mQueue;
+    private boolean getLastest = false;
+    private int currentPageCount = 1;
+    private Dialog loadingDialog;
+    private String cityId;
 
-	private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			myAdapter.clearAll();
-			GetData(1);
-		}
-	};
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            myAdapter.clearAll();
+            GetData(1);
+        }
+    };
 
-	@Override
-	public void onResume() {
-		super.onResume();
-		// 在当前的activity中注册广播
-		IntentFilter filter = new IntentFilter();
-		filter.addAction(Consts.CHOOSE_CITY_SIGNAL);
-		getActivity().registerReceiver(this.broadcastReceiver, filter);
-	}
+    @Override
+    public void onResume() {
+        super.onResume();
+        // 在当前的activity中注册广播
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Consts.CHOOSE_CITY_SIGNAL);
+        getActivity().registerReceiver(this.broadcastReceiver, filter);
+    }
 
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-		getActivity().unregisterReceiver(this.broadcastReceiver);
-	}
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        getActivity().unregisterReceiver(this.broadcastReceiver);
+    }
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
 
-		mQueue = Volley.newRequestQueue(getActivity());
-		loadingDialog = LoadingDialog.createLoadingDialog(getActivity(),
-				"数据加载中...");
-		currentPageCount = 1;
+        mQueue = Volley.newRequestQueue(getActivity());
+        loadingDialog = LoadingDialog.createLoadingDialog(getActivity(),
+                "数据加载中...");
+        currentPageCount = 1;
 
-		View view = inflater.inflate(R.layout.fragment_department, container,
-				false);
+        View view = inflater.inflate(R.layout.fragment_department, container,
+                false);
 
-		mPullRefreshListView = (PullToRefreshListView) view
-				.findViewById(R.id.pull_refresh_department_list);
+        mPullRefreshListView = (PullToRefreshListView) view
+                .findViewById(R.id.pull_refresh_department_list);
 
-		mPullRefreshListView
-				.setOnRefreshListener(new OnRefreshListener<ListView>() {
-					@Override
-					public void onRefresh(
-							PullToRefreshBase<ListView> refreshView) {
-						String label = DateUtils.formatDateTime(getActivity(),
-								System.currentTimeMillis(),
-								DateUtils.FORMAT_SHOW_TIME
-										| DateUtils.FORMAT_SHOW_DATE
-										| DateUtils.FORMAT_ABBREV_ALL);
+        mPullRefreshListView
+                .setOnRefreshListener(new OnRefreshListener<ListView>() {
+                    @Override
+                    public void onRefresh(
+                            PullToRefreshBase<ListView> refreshView) {
+                        String label = DateUtils.formatDateTime(getActivity(),
+                                System.currentTimeMillis(),
+                                DateUtils.FORMAT_SHOW_TIME
+                                        | DateUtils.FORMAT_SHOW_DATE
+                                        | DateUtils.FORMAT_ABBREV_ALL);
 
-						// Update the LastUpdatedLabel
-						refreshView.getLoadingLayoutProxy()
-								.setLastUpdatedLabel(label);
+                        // Update the LastUpdatedLabel
+                        refreshView.getLoadingLayoutProxy()
+                                .setLastUpdatedLabel(label);
 
-						// Do work to refresh the list here.
-						myAdapter.clearAll();
-						GetData(1);
-					}
-				});
+                        // Do work to refresh the list here.
+                        myAdapter.clearAll();
+                        GetData(1);
+                    }
+                });
 
-		mPullRefreshListView
-				.setOnLastItemVisibleListener(new OnLastItemVisibleListener() {
+        mPullRefreshListView
+                .setOnLastItemVisibleListener(new OnLastItemVisibleListener() {
 
-					@Override
-					public void onLastItemVisible() {
-						currentPageCount += 1;
-						GetData(currentPageCount);
-						getLastest = false;
+                    @Override
+                    public void onLastItemVisible() {
+                        currentPageCount += 1;
+                        GetData(currentPageCount);
+                        getLastest = false;
 
-					}
-				});
+                    }
+                });
 
-		actualListView = mPullRefreshListView.getRefreshableView();
+        actualListView = mPullRefreshListView.getRefreshableView();
 
-		// Need to use the Actual ListView when registering for Context Menu
-		// registerForContextMenu(actualListView);
+        // Need to use the Actual ListView when registering for Context Menu
+        // registerForContextMenu(actualListView);
 
-		// 绑定点击事件
-		actualListView.setOnItemClickListener(new OnItemClickListener() {
+        // 绑定点击事件
+        actualListView.setOnItemClickListener(new OnItemClickListener() {
 
-			public void onItemClick(AdapterView<?> parent, View view,
-					int position, long id) {
+            public void onItemClick(AdapterView<?> parent, View view,
+                    int position, long id) {
 
-				HashMap<String, String> temp = (HashMap<String, String>) parent
-						.getAdapter().getItem(position);
+                HashMap<String, String> temp = (HashMap<String, String>) parent
+                        .getAdapter().getItem(position);
 
-				Intent intent = new Intent(getActivity(),
-						DepartmentActivity.class);
-				intent.putExtra("departmentId", temp.get("id"));
-				intent.putExtra("departmentName", temp.get("name"));
-				intent.putExtra("departmentCMCount", temp.get("cmCount"));
-				intent.putExtra("departmentImageUrl", temp.get("img"));
-				intent.putExtra("departmentTel", temp.get("tel"));
-				intent.putExtra("departmentDes", temp.get("des"));
-				intent.putExtra("departmentCompanyName",
-						temp.get("companyName"));
-				intent.putExtra("departmentAddr", temp.get("addr"));
-				startActivity(intent);
-			}
+                Intent intent = new Intent(getActivity(),
+                        DepartmentActivity.class);
+                intent.putExtra("departmentId", temp.get("id"));
+                intent.putExtra("departmentName", temp.get("name"));
+                intent.putExtra("departmentCMCount", temp.get("cmCount"));
+                intent.putExtra("departmentImageUrl", temp.get("img"));
+                intent.putExtra("departmentTel", temp.get("tel"));
+                intent.putExtra("departmentDes", temp.get("des"));
+                intent.putExtra("departmentCompanyName",
+                        temp.get("companyName"));
+                intent.putExtra("departmentAddr", temp.get("addr"));
+                startActivity(intent);
+            }
 
-		});
+        });
 
-		myAdapter = new DepartmentListViewAdapter();
-		actualListView.setAdapter(myAdapter);
-		GetData(1);
-		return view;
-	}
+        myAdapter = new DepartmentListViewAdapter();
+        actualListView.setAdapter(myAdapter);
+        GetData(1);
+        return view;
+    }
 
-	private void GetData(int currentPage) {
+    private void GetData(int currentPage) {
 
-		ZXSharedPreferences mZxSharedPreferences = new ZXSharedPreferences(
-				getActivity());
-		cityId = mZxSharedPreferences.getCityId();
+        ZXSharedPreferences mZxSharedPreferences = new ZXSharedPreferences(
+                getActivity());
+        cityId = mZxSharedPreferences.getCityId();
 
-		loadingDialog.show();
+        loadingDialog.show();
 
-		JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-				Consts.MAIN_DOMAIN + "/kaihu/api_get_department_list?page="
-						+ currentPage + "&city_id=" + cityId, null,
-				new Response.Listener<JSONObject>() {
-					@Override
-					public void onResponse(JSONObject obj) {
-						// Log.d("TAG", obj.toString());
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                Consts.MAIN_DOMAIN + "/kaihu/api_get_department_list?page="
+                        + currentPage + "&city_id=" + cityId, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject obj) {
+                        // Log.d("TAG", obj.toString());
 
-						loadingDialog.hide();
+                        loadingDialog.hide();
 
-						try {
+                        try {
 
-							if (obj.getInt("errcode") == 0) {
-								JSONArray departments = obj
-										.getJSONArray("departments");
-								for (int i = 0; i < departments.length(); i++) {
-									JSONObject departmentObj = departments
-											.getJSONObject(i);
+                            if (obj.getInt("errcode") == 0) {
+                                JSONArray departments = obj
+                                        .getJSONArray("departments");
+                                for (int i = 0; i < departments.length(); i++) {
+                                    JSONObject departmentObj = departments
+                                            .getJSONObject(i);
 
-									myAdapter.addItem(
-											departmentObj.getString("id"),
-											departmentObj
-													.getString("short_name"),
-											departmentObj.getString("img"),
-											departmentObj.getString("tel"),
-											departmentObj.getString("addr"),
-											departmentObj.getString("cm_count"),
-											departmentObj
-													.getString("company_name"),
-											departmentObj.getString("des"));
-								}
-							}
-						} catch (JSONException e) {
+                                    myAdapter.addItem(
+                                            departmentObj.getString("id"),
+                                            departmentObj
+                                                    .getString("short_name"),
+                                            departmentObj.getString("img"),
+                                            departmentObj.getString("tel"),
+                                            departmentObj.getString("addr"),
+                                            departmentObj.getString("cm_count"),
+                                            departmentObj
+                                                    .getString("company_name"),
+                                            departmentObj.getString("des"));
+                                }
+                            }
+                        } catch (JSONException e) {
 
-						}
+                        }
 
-						myAdapter.notifyDataSetChanged();
+                        myAdapter.notifyDataSetChanged();
 
-						// Call onRefreshComplete when the list has been
-						// refreshed.
-						mPullRefreshListView.onRefreshComplete();
+                        // Call onRefreshComplete when the list has been
+                        // refreshed.
+                        mPullRefreshListView.onRefreshComplete();
 
-					}
-				}, new Response.ErrorListener() {
-					@Override
-					public void onErrorResponse(VolleyError error) {
-						Log.e("TAG", error.getMessage(), error);
-						loadingDialog.hide();
-					}
-				});
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("TAG", error.getMessage(), error);
+                        loadingDialog.hide();
+                    }
+                });
 
-		mQueue.add(jsonObjectRequest);
-	}
+        mQueue.add(jsonObjectRequest);
+    }
 
-	public class DepartmentListViewAdapter extends BaseAdapter {
-		ArrayList<HashMap<String, String>> items;
+    public class DepartmentListViewAdapter extends BaseAdapter {
+        ArrayList<HashMap<String, String>> items;
 
-		ImageLoader imageLoader;
+        ImageLoader imageLoader;
 
-		public DepartmentListViewAdapter() {
+        public DepartmentListViewAdapter() {
 
-			items = new ArrayList<HashMap<String, String>>();
+            items = new ArrayList<HashMap<String, String>>();
 
-			imageLoader = new ImageLoader(mQueue, new BitmapCache());
-		}
+            imageLoader = new ImageLoader(mQueue, new BitmapCache());
+        }
 
-		public int getCount() {
-			return items.size();
-		}
+        public int getCount() {
+            return items.size();
+        }
 
-		public HashMap<String, String> getItem(int position) {
-			return items.get(position);
-		}
+        public HashMap<String, String> getItem(int position) {
+            return items.get(position);
+        }
 
-		public long getItemId(int position) {
-			return position;
-		}
+        public long getItemId(int position) {
+            return position;
+        }
 
-		private View makeItemView(String strName, String strImageUrl,
-				String strTel, String strAddr) {
-			LayoutInflater inflater = (LayoutInflater) getActivity()
-					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        private View makeItemView(String strName, String strImageUrl,
+                String strTel, String strAddr) {
+            LayoutInflater inflater = (LayoutInflater) getActivity()
+                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-			// 使用View的对象itemView与R.layout.item关联
-			View itemView = inflater.inflate(R.layout.item_department, null);
+            // 使用View的对象itemView与R.layout.item关联
+            View itemView = inflater.inflate(R.layout.item_department, null);
 
-			TextView name = (TextView) itemView
-					.findViewById(R.id.departmentName);
-			name.setText(strName);
+            TextView name = (TextView) itemView
+                    .findViewById(R.id.departmentName);
+            name.setText(strName);
 
-			ImageView image = (ImageView) itemView
-					.findViewById(R.id.departmentImage);
-			ImageListener listener = ImageLoader.getImageListener(image,
-					R.drawable.default_person, R.drawable.default_person);
+            ImageView image = (ImageView) itemView
+                    .findViewById(R.id.departmentImage);
+            ImageListener listener = ImageLoader.getImageListener(image,
+                    R.drawable.default_person, R.drawable.default_person);
 
-			imageLoader.get(strImageUrl, listener);
+            imageLoader.get(strImageUrl, listener);
 
-			TextView tel = (TextView) itemView.findViewById(R.id.departmentTel);
-			tel.setText(strTel);
-			TextView addr = (TextView) itemView
-					.findViewById(R.id.departmentAddr);
-			addr.setText(strAddr);
+            TextView tel = (TextView) itemView.findViewById(R.id.departmentTel);
+            tel.setText(strTel);
+            TextView addr = (TextView) itemView
+                    .findViewById(R.id.departmentAddr);
+            addr.setText(strAddr);
 
-			return itemView;
-		}
+            return itemView;
+        }
 
-		public void addItem(String strId, String strName, String strImageUrl,
-				String strTel, String strAddr, String strCMCount,
-				String strCompanyName, String strDes) {
-			HashMap<String, String> temp = new HashMap<String, String>();
-			temp.put("id", strId);
-			temp.put("name", strName);
-			temp.put("img", strImageUrl);
-			temp.put("tel", strTel);
-			temp.put("addr", strAddr);
-			temp.put("cmCount", strCMCount);
-			temp.put("companyName", strCompanyName);
-			temp.put("des", strDes);
+        public void addItem(String strId, String strName, String strImageUrl,
+                String strTel, String strAddr, String strCMCount,
+                String strCompanyName, String strDes) {
+            HashMap<String, String> temp = new HashMap<String, String>();
+            temp.put("id", strId);
+            temp.put("name", strName);
+            temp.put("img", strImageUrl);
+            temp.put("tel", strTel);
+            temp.put("addr", strAddr);
+            temp.put("cmCount", strCMCount);
+            temp.put("companyName", strCompanyName);
+            temp.put("des", strDes);
 
-			if (getLastest) {
-				items.add(0, temp);
-			} else {
-				items.add(temp);
-			}
-		}
+            if (getLastest) {
+                items.add(0, temp);
+            } else {
+                items.add(temp);
+            }
+        }
 
-		public View getView(int position, View convertView, ViewGroup parent) {
-			// if (convertView == null)
+        public View getView(int position, View convertView, ViewGroup parent) {
+            // if (convertView == null)
 
-			// return convertView;
+            // return convertView;
 
-			HashMap<String, String> temp = items.get(position);
-			return makeItemView(temp.get("name"), temp.get("img"),
-					temp.get("tel"), temp.get("addr"));
-		}
+            HashMap<String, String> temp = items.get(position);
+            return makeItemView(temp.get("name"), temp.get("img"),
+                    temp.get("tel"), temp.get("addr"));
+        }
 
-		public void clearAll() {
-			items.clear();
-		}
-	}
+        public void clearAll() {
+            items.clear();
+        }
+    }
 
-	@Override
-	public void onCreateContextMenu(ContextMenu menu, View v,
-			ContextMenuInfo menuInfo) {
-		AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+            ContextMenuInfo menuInfo) {
+        AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
 
-		menu.setHeaderTitle("Item: ");
-		menu.add("Item 1");
-		menu.add("Item 2");
-		menu.add("Item 3");
-		menu.add("Item 4");
+        menu.setHeaderTitle("Item: ");
+        menu.add("Item 1");
+        menu.add("Item 2");
+        menu.add("Item 3");
+        menu.add("Item 4");
 
-		super.onCreateContextMenu(menu, v, menuInfo);
-	}
+        super.onCreateContextMenu(menu, v, menuInfo);
+    }
 }

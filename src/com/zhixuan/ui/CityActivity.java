@@ -28,112 +28,113 @@ import com.zhixuan.utils.ZXSharedPreferences;
 
 public class CityActivity extends Activity {
 
-	private ListView mCityListView;
-	private String provinceName = "";
-	private String provinceId = "";
-	private ZXSharedPreferences mZXSharedPreferences;
+    private ListView mCityListView;
+    private String provinceName = "";
+    private String provinceId = "";
+    private ZXSharedPreferences mZXSharedPreferences;
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_city);
-		setTitle("选择城市");
-		provinceName = getIntent().getStringExtra("provinceName");
-		provinceId = getIntent().getStringExtra("provinceId");
-		initView();
-	}
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
 
-	private void initView() {
-		mZXSharedPreferences = new ZXSharedPreferences(CityActivity.this);
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_city);
+        setTitle("选择城市");
+        provinceName = getIntent().getStringExtra("provinceName");
+        provinceId = getIntent().getStringExtra("provinceId");
+        initView();
+    }
 
-		mCityListView = (ListView) findViewById(R.id.lv_all_citys);
-		mCityListView.setAdapter(new CityListAdapter(this, provinceName));
+    private void initView() {
+        mZXSharedPreferences = new ZXSharedPreferences(CityActivity.this);
 
-		mCityListView.setOnItemClickListener(new OnItemClickListener() {
-			public void onItemClick(AdapterView<?> parent, View view,
-					int position, long id) {
-				HashMap<String, String> city = (HashMap<String, String>) parent
-						.getAdapter().getItem(position);
-				
-				mZXSharedPreferences.setCityId(city.get("id"));
-				mZXSharedPreferences.setCityName(city.get("name"));
-				
-				Intent intent = new Intent();
-				intent.setAction(Consts.CHOOSE_CITY_SIGNAL);
-				CityActivity.this.sendBroadcast(intent);
-				CityActivity.this.finish();
-			}
-		});
-	}
+        mCityListView = (ListView) findViewById(R.id.lv_all_citys);
+        mCityListView.setAdapter(new CityListAdapter(this, provinceName));
 
-	public class CityListAdapter extends BaseAdapter {
+        mCityListView.setOnItemClickListener(new OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view,
+                    int position, long id) {
+                HashMap<String, String> city = (HashMap<String, String>) parent
+                        .getAdapter().getItem(position);
 
-		private ArrayList<HashMap<String, String>> cities;
-		private Context context;
+                mZXSharedPreferences.setCityId(city.get("id"));
+                mZXSharedPreferences.setCityName(city.get("name"));
 
-		public CityListAdapter(Context context, String provinceName) {
-			this.context = context;
-			getCities();
-		}
+                Intent intent = new Intent();
+                intent.setAction(Consts.CHOOSE_CITY_SIGNAL);
+                CityActivity.this.sendBroadcast(intent);
+                CityActivity.this.finish();
+            }
+        });
+    }
 
-		private void getCities() {
-			cities = new ArrayList<HashMap<String, String>>();
+    public class CityListAdapter extends BaseAdapter {
 
-			String dataString = mZXSharedPreferences.getProvinceAndCityFromLocal();
-			try {
-				JSONObject root = new JSONObject(dataString);
-				JSONArray jsonProvinces = root.getJSONArray("data");
+        private ArrayList<HashMap<String, String>> cities;
+        private Context context;
 
-				// 循环省份
-				for (int i = 0; i < jsonProvinces.length(); i++) {
-					JSONObject jsonProvince = jsonProvinces.getJSONObject(i);
+        public CityListAdapter(Context context, String provinceName) {
+            this.context = context;
+            getCities();
+        }
 
-					// 找到匹配的省份
-					if (provinceId.equals(jsonProvince.getInt("id") + "")) {
-						JSONArray jsonCities = jsonProvince
-								.getJSONArray("cities");
-						// 循环城市
-						for (int j = 0; j < jsonCities.length(); j++) {
-							JSONObject jsonCity = jsonCities.getJSONObject(j);
+        private void getCities() {
+            cities = new ArrayList<HashMap<String, String>>();
 
-							HashMap<String, String> temp = new HashMap<String, String>();
-							temp.put("id", jsonCity.getInt("id") + "");
-							temp.put("name", jsonCity.getString("name"));
+            String dataString = mZXSharedPreferences
+                    .getProvinceAndCityFromLocal();
+            try {
+                JSONObject root = new JSONObject(dataString);
+                JSONArray jsonProvinces = root.getJSONArray("data");
 
-							cities.add(temp);
-						}
-						break;
-					}
-				}
-			} catch (JSONException e) {
+                // 循环省份
+                for (int i = 0; i < jsonProvinces.length(); i++) {
+                    JSONObject jsonProvince = jsonProvinces.getJSONObject(i);
 
-			}
-		}
+                    // 找到匹配的省份
+                    if (provinceId.equals(jsonProvince.getInt("id") + "")) {
+                        JSONArray jsonCities = jsonProvince
+                                .getJSONArray("cities");
+                        // 循环城市
+                        for (int j = 0; j < jsonCities.length(); j++) {
+                            JSONObject jsonCity = jsonCities.getJSONObject(j);
 
-		public int getCount() {
-			return cities.size();
-		}
+                            HashMap<String, String> temp = new HashMap<String, String>();
+                            temp.put("id", jsonCity.getInt("id") + "");
+                            temp.put("name", jsonCity.getString("name"));
 
-		public View getGenericView(HashMap<String, String> city) {
-			LayoutInflater inflater = (LayoutInflater) context
-					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			View itemView = inflater.inflate(R.layout.item_city, null);
-			TextView temp = (TextView) itemView.findViewById(R.id.tv_city_name);
-			temp.setText(city.get("name"));
-			return itemView;
-		}
+                            cities.add(temp);
+                        }
+                        break;
+                    }
+                }
+            } catch (JSONException e) {
 
-		public HashMap<String, String> getItem(int position) {
-			return cities.get(position);
-		}
+            }
+        }
 
-		public View getView(int position, View convertView, ViewGroup parent) {
-			return getGenericView(cities.get(position));
-		}
+        public int getCount() {
+            return cities.size();
+        }
 
-		public long getItemId(int position) {
-			return position;
-		}
-	}
+        public View getGenericView(HashMap<String, String> city) {
+            LayoutInflater inflater = (LayoutInflater) context
+                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View itemView = inflater.inflate(R.layout.item_city, null);
+            TextView temp = (TextView) itemView.findViewById(R.id.tv_city_name);
+            temp.setText(city.get("name"));
+            return itemView;
+        }
+
+        public HashMap<String, String> getItem(int position) {
+            return cities.get(position);
+        }
+
+        public View getView(int position, View convertView, ViewGroup parent) {
+            return getGenericView(cities.get(position));
+        }
+
+        public long getItemId(int position) {
+            return position;
+        }
+    }
 }

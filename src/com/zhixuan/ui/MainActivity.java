@@ -34,328 +34,328 @@ import com.zhixuan.utils.ZXSharedPreferences;
 
 public class MainActivity extends ActionBarActivity {
 
-	private ViewPager mViewPager;
-	private ArrayList<Fragment> mFragments;
-	private TextView mCustomManagerTextView;
-	private TextView mDepartmentTextView;
-	private TextView mAboutTextView;
-	private Menu mMenu;
-	private ZXSharedPreferences mZXSharedPreferences;
+    private ViewPager mViewPager;
+    private ArrayList<Fragment> mFragments;
+    private TextView mCustomManagerTextView;
+    private TextView mDepartmentTextView;
+    private TextView mAboutTextView;
+    private Menu mMenu;
+    private ZXSharedPreferences mZXSharedPreferences;
 
-	private ExpandableListView expandableListView;
-	private CityExpandableListAdapter cityExpandableListAdapter;
-	private Dialog cityDialog;
+    private ExpandableListView expandableListView;
+    private CityExpandableListAdapter cityExpandableListAdapter;
+    private Dialog cityDialog;
 
-	// public interface ChooseCityListener {
-	// public void onChoose(String cityName);
-	// }
-	//
-	// private ChooseCityListener listener;
+    // public interface ChooseCityListener {
+    // public void onChoose(String cityName);
+    // }
+    //
+    // private ChooseCityListener listener;
 
-	private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			MenuItem location = mMenu.findItem(R.id.action_location);
-			location.setTitle(mZXSharedPreferences.getCityName());
-		}
-	};
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            MenuItem location = mMenu.findItem(R.id.action_location);
+            location.setTitle(mZXSharedPreferences.getCityName());
+        }
+    };
 
-	@Override
-	public void onResume() {
-		super.onResume();
-		// 在当前的activity中注册广播
-		IntentFilter filter = new IntentFilter();
-		filter.addAction(Consts.CHOOSE_CITY_SIGNAL);
-		this.registerReceiver(this.broadcastReceiver, filter);
-	}
+    @Override
+    public void onResume() {
+        super.onResume();
+        // 在当前的activity中注册广播
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Consts.CHOOSE_CITY_SIGNAL);
+        this.registerReceiver(this.broadcastReceiver, filter);
+    }
 
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-		this.unregisterReceiver(this.broadcastReceiver);
-	}
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        this.unregisterReceiver(this.broadcastReceiver);
+    }
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
 
-		// 隐藏title
-		// requestWindowFeature(Window.FEATURE_NO_TITLE);
+        // 隐藏title
+        // requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-		initView();
-	}
+        initView();
+    }
 
-	public void initView() {
-		mZXSharedPreferences = new ZXSharedPreferences(MainActivity.this);
+    public void initView() {
+        mZXSharedPreferences = new ZXSharedPreferences(MainActivity.this);
 
-		// 如果本地没有城市信息，请求服务端加载
-		if (!mZXSharedPreferences.hasProvinceAndCity()) {
-			mZXSharedPreferences.getProvinceAndCityFromServer();
-		}
+        // 如果本地没有城市信息，请求服务端加载
+        if (!mZXSharedPreferences.hasProvinceAndCity()) {
+            mZXSharedPreferences.getProvinceAndCityFromServer();
+        }
 
-		mCustomManagerTextView = (TextView) findViewById(R.id.nav_tv_cm);
-		mCustomManagerTextView.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				mViewPager.setCurrentItem(0, false);
-			}
-		});
-		mDepartmentTextView = (TextView) findViewById(R.id.nav_tv_department);
-		mDepartmentTextView.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				mViewPager.setCurrentItem(1, false);
-			}
-		});
-		mAboutTextView = (TextView) findViewById(R.id.nav_tv_about);
-		mAboutTextView.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				mViewPager.setCurrentItem(2, false);
-			}
-		});
+        mCustomManagerTextView = (TextView) findViewById(R.id.nav_tv_cm);
+        mCustomManagerTextView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mViewPager.setCurrentItem(0, false);
+            }
+        });
+        mDepartmentTextView = (TextView) findViewById(R.id.nav_tv_department);
+        mDepartmentTextView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mViewPager.setCurrentItem(1, false);
+            }
+        });
+        mAboutTextView = (TextView) findViewById(R.id.nav_tv_about);
+        mAboutTextView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mViewPager.setCurrentItem(2, false);
+            }
+        });
 
-		mFragments = new ArrayList<Fragment>();
-		mFragments.add(new CustomManagerFragment());
-		mFragments.add(new DepartmentFragment());
-		mFragments.add(new AboutFragment());
+        mFragments = new ArrayList<Fragment>();
+        mFragments.add(new CustomManagerFragment());
+        mFragments.add(new DepartmentFragment());
+        mFragments.add(new AboutFragment());
 
-		mViewPager = (ViewPager) findViewById(R.id.vp_main);
-		mViewPager.setAdapter(new FragmentPagerAdapter(
-				getSupportFragmentManager()) {
+        mViewPager = (ViewPager) findViewById(R.id.vp_main);
+        mViewPager.setAdapter(new FragmentPagerAdapter(
+                getSupportFragmentManager()) {
 
-			@Override
-			public int getCount() {
-				return mFragments.size();
-			}
+            @Override
+            public int getCount() {
+                return mFragments.size();
+            }
 
-			@Override
-			public Fragment getItem(int position) {
-				return mFragments.get(position);
-			}
-		});
-		mViewPager.setOnPageChangeListener(new OnPageChangeListener() {
+            @Override
+            public Fragment getItem(int position) {
+                return mFragments.get(position);
+            }
+        });
+        mViewPager.setOnPageChangeListener(new OnPageChangeListener() {
 
-			@Override
-			public void onPageSelected(int position) {
-				mCustomManagerTextView.setTextColor(Color.BLACK);
-				mDepartmentTextView.setTextColor(Color.BLACK);
-				mAboutTextView.setTextColor(Color.BLACK);
+            @Override
+            public void onPageSelected(int position) {
+                mCustomManagerTextView.setTextColor(Color.BLACK);
+                mDepartmentTextView.setTextColor(Color.BLACK);
+                mAboutTextView.setTextColor(Color.BLACK);
 
-				switch (position) {
-				case 0:
-					mCustomManagerTextView.setTextColor(getResources()
-							.getColor(R.color.main_color));
-					break;
-				case 1:
-					mDepartmentTextView.setTextColor(getResources().getColor(
-							R.color.main_color));
-					break;
-				case 2:
-					mAboutTextView.setTextColor(getResources().getColor(
-							R.color.main_color));
-					break;
-				}
-			}
+                switch (position) {
+                case 0:
+                    mCustomManagerTextView.setTextColor(getResources()
+                            .getColor(R.color.main_color));
+                    break;
+                case 1:
+                    mDepartmentTextView.setTextColor(getResources().getColor(
+                            R.color.main_color));
+                    break;
+                case 2:
+                    mAboutTextView.setTextColor(getResources().getColor(
+                            R.color.main_color));
+                    break;
+                }
+            }
 
-			@Override
-			public void onPageScrolled(int arg0, float arg1, int arg2) {
-			}
+            @Override
+            public void onPageScrolled(int arg0, float arg1, int arg2) {
+            }
 
-			@Override
-			public void onPageScrollStateChanged(int arg0) {
-			}
-		});
+            @Override
+            public void onPageScrollStateChanged(int arg0) {
+            }
+        });
 
-		// cityDialog = chooseCityDialog();
+        // cityDialog = chooseCityDialog();
 
-		UpdateManager um = new UpdateManager(MainActivity.this);
-		um.checkUpdate(false);
-		
-		ActionBar actionBar = getSupportActionBar();
-		actionBar.setDisplayUseLogoEnabled(false);
-	}
+        UpdateManager um = new UpdateManager(MainActivity.this);
+        um.checkUpdate(false);
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		// for (int i = 0; i < 5; i++) {
-		// menu.add(1, i, i, "菜单-" + i);
-		// }
-		mMenu = menu;
-		String cityName = mZXSharedPreferences.getCityName();
-		mMenu.findItem(R.id.action_location).setTitle(cityName);
-		return true;
-	}
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayUseLogoEnabled(false);
+    }
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		int id = item.getItemId();
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        // for (int i = 0; i < 5; i++) {
+        // menu.add(1, i, i, "菜单-" + i);
+        // }
+        mMenu = menu;
+        String cityName = mZXSharedPreferences.getCityName();
+        mMenu.findItem(R.id.action_location).setTitle(cityName);
+        return true;
+    }
 
-		if (id == R.id.action_location) {
-			// cityDialog.show();
-			Intent intent = new Intent(this, ProvinceActivity.class);
-			startActivity(intent);
-		}
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
 
-		return super.onOptionsItemSelected(item);
-	}
+        if (id == R.id.action_location) {
+            // cityDialog.show();
+            Intent intent = new Intent(this, ProvinceActivity.class);
+            startActivity(intent);
+        }
 
-	private Dialog chooseCityDialog() {
-		Dialog dialog = new Dialog(this, R.style.city_dialog);
-		dialog.setTitle("选择城市");
-		dialog.setContentView(R.layout.dialog_city);
+        return super.onOptionsItemSelected(item);
+    }
 
-		expandableListView = (ExpandableListView) dialog
-				.findViewById(R.id.expandableListView);
+    private Dialog chooseCityDialog() {
+        Dialog dialog = new Dialog(this, R.style.city_dialog);
+        dialog.setTitle("选择城市");
+        dialog.setContentView(R.layout.dialog_city);
 
-		cityExpandableListAdapter = new CityExpandableListAdapter(this);
-		expandableListView.setAdapter(cityExpandableListAdapter);
+        expandableListView = (ExpandableListView) dialog
+                .findViewById(R.id.expandableListView);
 
-		// 事件监听
-		expandableListView.setOnChildClickListener(new OnChildClickListener() {
+        cityExpandableListAdapter = new CityExpandableListAdapter(this);
+        expandableListView.setAdapter(cityExpandableListAdapter);
 
-			@Override
-			public boolean onChildClick(ExpandableListView parent, View v,
-					int groupPosition, int childPosition, long id) {
+        // 事件监听
+        expandableListView.setOnChildClickListener(new OnChildClickListener() {
 
-				String cityName = cityExpandableListAdapter.getChild(
-						groupPosition, childPosition).toString();
+            @Override
+            public boolean onChildClick(ExpandableListView parent, View v,
+                    int groupPosition, int childPosition, long id) {
 
-				Fragment temp = mFragments.get(mViewPager.getCurrentItem());
-				// if (temp instanceof ChooseCityListener) {
-				// listener = (ChooseCityListener) temp;
-				// listener.onChoose(cityName);
-				// }
+                String cityName = cityExpandableListAdapter.getChild(
+                        groupPosition, childPosition).toString();
 
-				cityDialog.hide();
+                Fragment temp = mFragments.get(mViewPager.getCurrentItem());
+                // if (temp instanceof ChooseCityListener) {
+                // listener = (ChooseCityListener) temp;
+                // listener.onChoose(cityName);
+                // }
 
-				return false;
-			}
-		});
+                cityDialog.hide();
 
-		return dialog;
-	}
+                return false;
+            }
+        });
 
-	public class CityExpandableListAdapter extends BaseExpandableListAdapter {
+        return dialog;
+    }
 
-		private ArrayList<String> groups;
-		private ArrayList<ArrayList<String>> children;
-		private Context context;
+    public class CityExpandableListAdapter extends BaseExpandableListAdapter {
 
-		public CityExpandableListAdapter(Context context) {
-			this.context = context;
+        private ArrayList<String> groups;
+        private ArrayList<ArrayList<String>> children;
+        private Context context;
 
-			groups = new ArrayList<String>();
-			groups.add("湖北省");
-			groups.add("湖南省");
-			groups.add("四川省");
-			groups.add("广州省");
+        public CityExpandableListAdapter(Context context) {
+            this.context = context;
 
-			children = new ArrayList<ArrayList<String>>();
-			ArrayList<String> child = new ArrayList<String>();
-			child.add("武汉");
-			child.add("荆州");
-			child.add("宜昌");
-			child.add("天门");
-			children.add(child);
+            groups = new ArrayList<String>();
+            groups.add("湖北省");
+            groups.add("湖南省");
+            groups.add("四川省");
+            groups.add("广州省");
 
-			child = new ArrayList<String>();
-			child.add("长沙");
-			child.add("益阳");
-			child.add("怀化");
-			children.add(child);
+            children = new ArrayList<ArrayList<String>>();
+            ArrayList<String> child = new ArrayList<String>();
+            child.add("武汉");
+            child.add("荆州");
+            child.add("宜昌");
+            child.add("天门");
+            children.add(child);
 
-			child = new ArrayList<String>();
-			child.add("成都");
-			child.add("德阳");
-			child.add("绵阳");
-			child.add("雅安");
-			children.add(child);
+            child = new ArrayList<String>();
+            child.add("长沙");
+            child.add("益阳");
+            child.add("怀化");
+            children.add(child);
 
-			child = new ArrayList<String>();
-			child.add("广州");
-			child.add("深圳");
-			child.add("汕头");
-			children.add(child);
-		}
+            child = new ArrayList<String>();
+            child.add("成都");
+            child.add("德阳");
+            child.add("绵阳");
+            child.add("雅安");
+            children.add(child);
 
-		public View getGenericView() {
-			TextView view = new TextView(context);
-			view.setLayoutParams(new LayoutParams(
-					ViewGroup.LayoutParams.MATCH_PARENT, 64));
-			view.setGravity(Gravity.CENTER_VERTICAL | Gravity.LEFT);
-			view.setPadding(80, 0, 0, 0);
-			view.setTextSize(20);
-			return view;
-		}
+            child = new ArrayList<String>();
+            child.add("广州");
+            child.add("深圳");
+            child.add("汕头");
+            children.add(child);
+        }
 
-		@Override
-		public Object getGroup(int groupPosition) {
-			return groups.get(groupPosition);
-		}
+        public View getGenericView() {
+            TextView view = new TextView(context);
+            view.setLayoutParams(new LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, 64));
+            view.setGravity(Gravity.CENTER_VERTICAL | Gravity.LEFT);
+            view.setPadding(80, 0, 0, 0);
+            view.setTextSize(20);
+            return view;
+        }
 
-		@Override
-		public long getGroupId(int groupPosition) {
-			return groupPosition;
-		}
+        @Override
+        public Object getGroup(int groupPosition) {
+            return groups.get(groupPosition);
+        }
 
-		@Override
-		public int getGroupCount() {
-			return groups.size();
-		}
+        @Override
+        public long getGroupId(int groupPosition) {
+            return groupPosition;
+        }
 
-		@Override
-		public View getGroupView(int groupPosition, boolean isExpanded,
-				View convertView, ViewGroup parent) {
-			if (convertView == null) {
-				convertView = getGenericView();
-			}
+        @Override
+        public int getGroupCount() {
+            return groups.size();
+        }
 
-			TextView temp = (TextView) convertView;
-			temp.setText(getGroup(groupPosition).toString());
-			return temp;
-		}
+        @Override
+        public View getGroupView(int groupPosition, boolean isExpanded,
+                View convertView, ViewGroup parent) {
+            if (convertView == null) {
+                convertView = getGenericView();
+            }
 
-		@Override
-		public Object getChild(int groupPosition, int childPosition) {
-			return children.get(groupPosition).get(childPosition);
-		}
+            TextView temp = (TextView) convertView;
+            temp.setText(getGroup(groupPosition).toString());
+            return temp;
+        }
 
-		@Override
-		public long getChildId(int groupPosition, int childPosition) {
-			return childPosition;
-		}
+        @Override
+        public Object getChild(int groupPosition, int childPosition) {
+            return children.get(groupPosition).get(childPosition);
+        }
 
-		@Override
-		public int getChildrenCount(int groupPosition) {
-			return children.get(groupPosition).size();
-		}
+        @Override
+        public long getChildId(int groupPosition, int childPosition) {
+            return childPosition;
+        }
 
-		@Override
-		public View getChildView(int groupPosition, int childPosition,
-				boolean isLastChild, View convertView, ViewGroup parent) {
-			if (convertView == null) {
-				convertView = getGenericView();
-			}
+        @Override
+        public int getChildrenCount(int groupPosition) {
+            return children.get(groupPosition).size();
+        }
 
-			TextView temp = (TextView) convertView;
-			temp.setText(getChild(groupPosition, childPosition).toString());
-			return temp;
-		}
+        @Override
+        public View getChildView(int groupPosition, int childPosition,
+                boolean isLastChild, View convertView, ViewGroup parent) {
+            if (convertView == null) {
+                convertView = getGenericView();
+            }
 
-		@Override
-		public boolean hasStableIds() {
-			return true;
-		}
+            TextView temp = (TextView) convertView;
+            temp.setText(getChild(groupPosition, childPosition).toString());
+            return temp;
+        }
 
-		@Override
-		public boolean isChildSelectable(int groupPosition, int childPosition) {
-			return true;
-		}
-	}
+        @Override
+        public boolean hasStableIds() {
+            return true;
+        }
+
+        @Override
+        public boolean isChildSelectable(int groupPosition, int childPosition) {
+            return true;
+        }
+    }
 
 }
