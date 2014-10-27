@@ -4,6 +4,8 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
+    <include layout="@layout/top_child" />
+    
     <ListView
         android:paddingLeft="15dp"
         android:id="@+id/lv_all_provinces"

@@ -62,6 +62,7 @@ public class DepartmentFragment extends Fragment {
         @Override
         public void onReceive(Context context, Intent intent) {
             myAdapter.clearAll();
+            currentPageCount = 1;
             GetData(1);
         }
     };
@@ -113,6 +114,7 @@ public class DepartmentFragment extends Fragment {
 
                         // Do work to refresh the list here.
                         myAdapter.clearAll();
+                        currentPageCount = 1;
                         GetData(1);
                     }
                 });

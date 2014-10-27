@@ -12,23 +12,23 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.zhixuan.R;
 import com.zhixuan.utils.Consts;
 import com.zhixuan.utils.ZXSharedPreferences;
 
-public class ProvinceActivity extends Activity {
+public class ProvinceActivity extends BaseChildActivity {
 
     private ListView mProvinceListView;
     private ZXSharedPreferences mZxSharedPreferences;
@@ -45,8 +45,9 @@ public class ProvinceActivity extends Activity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_province);
-        setTitle("选择省份");
+        
         initView();
+        super.mTitleString = "选择省份";
 
     }
 
@@ -82,7 +83,7 @@ public class ProvinceActivity extends Activity {
                 startActivity(intent);
             }
         });
-
+        
     }
 
     public class ProvinceListAdapter extends BaseAdapter {

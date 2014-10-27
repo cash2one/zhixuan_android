@@ -57,6 +57,7 @@ public class CustomManagerFragment extends Fragment {
         @Override
         public void onReceive(Context context, Intent intent) {
             myAdapter.clearAll();
+            currentPageCount = 1;
             GetData(1);
         }
     };
@@ -72,8 +73,8 @@ public class CustomManagerFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         getActivity().unregisterReceiver(this.broadcastReceiver);
+        super.onDestroy();
     }
 
     @Override
@@ -109,6 +110,7 @@ public class CustomManagerFragment extends Fragment {
 
                         // Do work to refresh the list here.
                         myAdapter.clearAll();
+                        currentPageCount = 1;
                         GetData(1);
                     }
                 });

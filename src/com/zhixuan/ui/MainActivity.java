@@ -13,16 +13,15 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Gravity;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AbsListView.LayoutParams;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.TextView;
@@ -39,7 +38,8 @@ public class MainActivity extends ActionBarActivity {
     private TextView mCustomManagerTextView;
     private TextView mDepartmentTextView;
     private TextView mAboutTextView;
-    private Menu mMenu;
+    //private Menu mMenu;
+    private Button mLocationButton;
     private ZXSharedPreferences mZXSharedPreferences;
 
     private ExpandableListView expandableListView;
@@ -55,8 +55,7 @@ public class MainActivity extends ActionBarActivity {
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            MenuItem location = mMenu.findItem(R.id.action_location);
-            location.setTitle(mZXSharedPreferences.getCityName());
+            mLocationButton.setText(mZXSharedPreferences.getCityName());
         }
     };
 
@@ -71,8 +70,8 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         this.unregisterReceiver(this.broadcastReceiver);
+        super.onDestroy();
     }
 
     @Override
@@ -84,6 +83,7 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        
         initView();
     }
 
@@ -171,38 +171,28 @@ public class MainActivity extends ActionBarActivity {
 
         // cityDialog = chooseCityDialog();
 
+        // 检查更新
         UpdateManager um = new UpdateManager(MainActivity.this);
         um.checkUpdate(false);
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayUseLogoEnabled(false);
+        // 隐藏默认的actionbar
+        getActionBar().hide();
+        
+        // 点击地点事件
+        mLocationButton = (Button)findViewById(R.id.btn_top_location);
+        mLocationButton.setText(mZXSharedPreferences.getCityName());
+        mLocationButton.setOnClickListener(new OnClickListener() {
+            
+            @Override
+            public void onClick(View v) {
+                // TODO Auto-generated method stub
+                Intent intent = new Intent(MainActivity.this, ProvinceActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        // for (int i = 0; i < 5; i++) {
-        // menu.add(1, i, i, "菜单-" + i);
-        // }
-        mMenu = menu;
-        String cityName = mZXSharedPreferences.getCityName();
-        mMenu.findItem(R.id.action_location).setTitle(cityName);
-        return true;
-    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.action_location) {
-            // cityDialog.show();
-            Intent intent = new Intent(this, ProvinceActivity.class);
-            startActivity(intent);
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 
     private Dialog chooseCityDialog() {
         Dialog dialog = new Dialog(this, R.style.city_dialog);

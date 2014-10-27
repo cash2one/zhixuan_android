@@ -26,7 +26,7 @@ import com.zhixuan.R;
 import com.zhixuan.utils.Consts;
 import com.zhixuan.utils.ZXSharedPreferences;
 
-public class CityActivity extends Activity {
+public class CityActivity extends BaseChildActivity {
 
     private ListView mCityListView;
     private String provinceName = "";
@@ -38,10 +38,11 @@ public class CityActivity extends Activity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_city);
-        setTitle("选择城市");
+        
         provinceName = getIntent().getStringExtra("provinceName");
         provinceId = getIntent().getStringExtra("provinceId");
         initView();
+        super.mTitleString = "选择城市";
     }
 
     private void initView() {
