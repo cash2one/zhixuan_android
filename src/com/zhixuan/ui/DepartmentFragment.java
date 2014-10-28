@@ -273,10 +273,10 @@ public class DepartmentFragment extends Fragment {
             imageLoader.get(strImageUrl, listener);
 
             TextView tel = (TextView) itemView.findViewById(R.id.departmentTel);
-            tel.setText(strTel);
+            tel.setText("µÁª∞:  " + strTel);
             TextView addr = (TextView) itemView
                     .findViewById(R.id.departmentAddr);
-            addr.setText(strAddr);
+            addr.setText("µÿ÷∑:  " + strAddr);
 
             return itemView;
         }

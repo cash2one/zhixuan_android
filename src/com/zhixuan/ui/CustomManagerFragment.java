@@ -243,9 +243,9 @@ public class CustomManagerFragment extends Fragment {
             TextView info = (TextView) itemView.findViewById(R.id.cmInfo);
             info.setText(strCompanyName + "     " + strInfo);
             TextView tel = (TextView) itemView.findViewById(R.id.cmTel);
-            tel.setText("电话   " + strTel);
+            tel.setText("电话:   " + strTel);
             TextView QQ = (TextView) itemView.findViewById(R.id.cmQQ);
-            QQ.setText("QQ  " + strQQ);
+            QQ.setText("QQ:  " + strQQ);
 
             return itemView;
         }

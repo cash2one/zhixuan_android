@@ -23,7 +23,9 @@ import android.widget.AbsListView.LayoutParams;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
 import android.widget.ExpandableListView;
+import android.widget.ImageView;
 import android.widget.ExpandableListView.OnChildClickListener;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.zhixuan.R;
@@ -35,11 +37,19 @@ public class MainActivity extends ActionBarActivity {
 
     private ViewPager mViewPager;
     private ArrayList<Fragment> mFragments;
+    private LinearLayout mCustomManagerLinearLayout;
     private TextView mCustomManagerTextView;
+    private ImageView mCustomManagerImageView;
+    private LinearLayout mDepartmentLinearLayout;
     private TextView mDepartmentTextView;
+    private ImageView mDepartmentImageView;
+    private LinearLayout mAboutLinearLayout;
     private TextView mAboutTextView;
-    //private Menu mMenu;
-    private Button mLocationButton;
+    private ImageView mAboutImageView;
+
+    // private Menu mMenu;
+    private TextView mTopTitleTextView;
+    private TextView mLocationTextView;
     private ZXSharedPreferences mZXSharedPreferences;
 
     private ExpandableListView expandableListView;
@@ -55,7 +65,7 @@ public class MainActivity extends ActionBarActivity {
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            mLocationButton.setText(mZXSharedPreferences.getCityName());
+            mLocationTextView.setText(mZXSharedPreferences.getCityName());
         }
     };
 
@@ -83,7 +93,6 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        
         initView();
     }
 
@@ -95,22 +104,30 @@ public class MainActivity extends ActionBarActivity {
             mZXSharedPreferences.getProvinceAndCityFromServer();
         }
 
+        mTopTitleTextView = (TextView)findViewById(R.id.tv_main_top_title);
+        
+        mCustomManagerImageView = (ImageView) findViewById(R.id.nav_iv_cm);
         mCustomManagerTextView = (TextView) findViewById(R.id.nav_tv_cm);
-        mCustomManagerTextView.setOnClickListener(new OnClickListener() {
+        mCustomManagerLinearLayout = (LinearLayout) findViewById(R.id.nav_ll_cm);
+        mCustomManagerLinearLayout.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 mViewPager.setCurrentItem(0, false);
             }
         });
+        mDepartmentImageView = (ImageView) findViewById(R.id.nav_iv_department);
         mDepartmentTextView = (TextView) findViewById(R.id.nav_tv_department);
-        mDepartmentTextView.setOnClickListener(new OnClickListener() {
+        mDepartmentLinearLayout = (LinearLayout) findViewById(R.id.nav_ll_department);
+        mDepartmentLinearLayout.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 mViewPager.setCurrentItem(1, false);
             }
         });
+        mAboutImageView = (ImageView) findViewById(R.id.nav_iv_about);
         mAboutTextView = (TextView) findViewById(R.id.nav_tv_about);
-        mAboutTextView.setOnClickListener(new OnClickListener() {
+        mAboutLinearLayout = (LinearLayout) findViewById(R.id.nav_ll_about);
+        mAboutLinearLayout.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 mViewPager.setCurrentItem(2, false);
@@ -141,21 +158,33 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onPageSelected(int position) {
                 mCustomManagerTextView.setTextColor(Color.BLACK);
+                mCustomManagerImageView
+                        .setImageResource(R.drawable.custom_manager1);
                 mDepartmentTextView.setTextColor(Color.BLACK);
+                mDepartmentImageView.setImageResource(R.drawable.department1);
                 mAboutTextView.setTextColor(Color.BLACK);
+                mAboutImageView.setImageResource(R.drawable.about1);
 
                 switch (position) {
                 case 0:
                     mCustomManagerTextView.setTextColor(getResources()
                             .getColor(R.color.main_color));
+                    mCustomManagerImageView
+                            .setImageResource(R.drawable.custom_manager2);
+                    mTopTitleTextView.setText("客户经理");
                     break;
                 case 1:
                     mDepartmentTextView.setTextColor(getResources().getColor(
                             R.color.main_color));
+                    mDepartmentImageView
+                            .setImageResource(R.drawable.department2);
+                    mTopTitleTextView.setText("营业部");
                     break;
                 case 2:
                     mAboutTextView.setTextColor(getResources().getColor(
                             R.color.main_color));
+                    mAboutImageView.setImageResource(R.drawable.about2);
+                    mTopTitleTextView.setText("关于");
                     break;
                 }
             }
@@ -177,22 +206,21 @@ public class MainActivity extends ActionBarActivity {
 
         // 隐藏默认的actionbar
         getActionBar().hide();
-        
+
         // 点击地点事件
-        mLocationButton = (Button)findViewById(R.id.btn_top_location);
-        mLocationButton.setText(mZXSharedPreferences.getCityName());
-        mLocationButton.setOnClickListener(new OnClickListener() {
-            
+        mLocationTextView = (TextView) findViewById(R.id.tv_top_location);
+        mLocationTextView.setText(mZXSharedPreferences.getCityName());
+        mLocationTextView.setOnClickListener(new OnClickListener() {
+
             @Override
             public void onClick(View v) {
                 // TODO Auto-generated method stub
-                Intent intent = new Intent(MainActivity.this, ProvinceActivity.class);
+                Intent intent = new Intent(MainActivity.this,
+                        ProvinceActivity.class);
                 startActivity(intent);
             }
         });
     }
-
-
 
     private Dialog chooseCityDialog() {
         Dialog dialog = new Dialog(this, R.style.city_dialog);
