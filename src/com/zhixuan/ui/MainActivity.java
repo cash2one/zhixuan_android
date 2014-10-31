@@ -14,20 +14,20 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.AbsListView.LayoutParams;
 import android.widget.BaseExpandableListAdapter;
-import android.widget.Button;
 import android.widget.ExpandableListView;
-import android.widget.ImageView;
 import android.widget.ExpandableListView.OnChildClickListener;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.umeng.analytics.MobclickAgent;
 import com.zhixuan.R;
 import com.zhixuan.utils.Consts;
 import com.zhixuan.utils.UpdateManager;
@@ -76,6 +76,15 @@ public class MainActivity extends ActionBarActivity {
         IntentFilter filter = new IntentFilter();
         filter.addAction(Consts.CHOOSE_CITY_SIGNAL);
         this.registerReceiver(this.broadcastReceiver, filter);
+
+        // 友盟
+        MobclickAgent.onResume(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        MobclickAgent.onPause(this);
     }
 
     @Override
@@ -86,14 +95,13 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-        // 隐藏title
-        // requestWindowFeature(Window.FEATURE_NO_TITLE);
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         initView();
+
+        // 友盟统计
+        MobclickAgent.updateOnlineConfig(this);
     }
 
     public void initView() {
@@ -102,10 +110,11 @@ public class MainActivity extends ActionBarActivity {
         // 如果本地没有城市信息，请求服务端加载
         if (!mZXSharedPreferences.hasProvinceAndCity()) {
             mZXSharedPreferences.getProvinceAndCityFromServer();
+            mZXSharedPreferences.getCurrentCity();
         }
 
-        mTopTitleTextView = (TextView)findViewById(R.id.tv_main_top_title);
-        
+        mTopTitleTextView = (TextView) findViewById(R.id.tv_main_top_title);
+
         mCustomManagerImageView = (ImageView) findViewById(R.id.nav_iv_cm);
         mCustomManagerTextView = (TextView) findViewById(R.id.nav_tv_cm);
         mCustomManagerLinearLayout = (LinearLayout) findViewById(R.id.nav_ll_cm);

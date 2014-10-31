@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -63,7 +62,7 @@ public class DepartmentActivity extends BaseChildActivity {
         // 设置控件
         ImageView image = (ImageView) findViewById(R.id.departmentImage);
         ImageListener listener = ImageLoader.getImageListener(image,
-                R.drawable.default_person, R.drawable.default_person);
+                R.drawable.default_department, R.drawable.default_department);
         imageLoader.get(departmentImageUrl, listener);
 
         TextView name = (TextView) findViewById(R.id.departmentName);
@@ -177,6 +176,13 @@ public class DepartmentActivity extends BaseChildActivity {
             // listView.getDividerHeight()获取子项间分隔符占用的高度
             // params.height最后得到整个ListView完整显示需要的高度
             mListView.setLayoutParams(params);
+
+            // 如果没有客户经理 则隐藏title
+            TextView tempTextView = (TextView) findViewById(R.id.tv_cm_of_department);
+            tempTextView.setVisibility(View.VISIBLE);
+            if (mAdapter.getCount() == 0) {
+                tempTextView.setVisibility(View.GONE);
+            }
         }
 
         public View getGenericView(HashMap<String, String> customManager) {
@@ -223,12 +229,5 @@ public class DepartmentActivity extends BaseChildActivity {
         public HashMap<String, String> getItem(int position) {
             return lists.get(position);
         }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        this.finish();
-        return super.onOptionsItemSelected(item);
     }
 }

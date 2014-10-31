@@ -260,7 +260,7 @@ public class UpdateManager {
 
         AlertDialog.Builder builder = new Builder(mContext);
 
-        builder.setMessage("当前版本已经是最新版本，无需升级!");
+        builder.setMessage("已经是最新版本:" + getVersionName());
         builder.setPositiveButton("好滴", new OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {

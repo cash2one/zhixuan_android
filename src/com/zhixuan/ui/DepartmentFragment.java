@@ -12,7 +12,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.format.DateUtils;
@@ -37,11 +36,11 @@ import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.ImageLoader.ImageListener;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.zhixuan.R;
+import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshBase.OnLastItemVisibleListener;
 import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
-import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
+import com.zhixuan.R;
 import com.zhixuan.utils.BitmapCache;
 import com.zhixuan.utils.Consts;
 import com.zhixuan.utils.LoadingDialog;
@@ -173,6 +172,10 @@ public class DepartmentFragment extends Fragment {
                 getActivity());
         cityId = mZxSharedPreferences.getCityId();
 
+        if (cityId == "") {
+            return;
+        }
+
         loadingDialog.show();
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
@@ -254,7 +257,7 @@ public class DepartmentFragment extends Fragment {
         }
 
         private View makeItemView(String strName, String strImageUrl,
-                String strTel, String strAddr) {
+                String strTel, String strAddr, String strCMCount) {
             LayoutInflater inflater = (LayoutInflater) getActivity()
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
@@ -268,16 +271,23 @@ public class DepartmentFragment extends Fragment {
             ImageView image = (ImageView) itemView
                     .findViewById(R.id.departmentImage);
             ImageListener listener = ImageLoader.getImageListener(image,
-                    R.drawable.default_person, R.drawable.default_person);
-
+                    R.drawable.default_department,
+                    R.drawable.default_department);
             imageLoader.get(strImageUrl, listener);
 
             TextView tel = (TextView) itemView.findViewById(R.id.departmentTel);
             tel.setText("µÁª∞:  " + strTel);
+
             TextView addr = (TextView) itemView
                     .findViewById(R.id.departmentAddr);
             addr.setText("µÿ÷∑:  " + strAddr);
 
+            TextView cmCount = (TextView) itemView
+                    .findViewById(R.id.cmCountOfDepartment);
+            
+            if (!strCMCount.equals("0")) {
+                cmCount.setText(strCMCount);
+            } 
             return itemView;
         }
 
@@ -308,7 +318,7 @@ public class DepartmentFragment extends Fragment {
 
             HashMap<String, String> temp = items.get(position);
             return makeItemView(temp.get("name"), temp.get("img"),
-                    temp.get("tel"), temp.get("addr"));
+                    temp.get("tel"), temp.get("addr"), temp.get("cmCount"));
         }
 
         public void clearAll() {

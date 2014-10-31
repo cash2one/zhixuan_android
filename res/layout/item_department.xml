@@ -22,12 +22,31 @@
         android:layout_marginTop="10dp"
         android:orientation="vertical" >
 
-        <TextView
-            android:id="@+id/departmentName"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="15sp"
-            android:textStyle="bold" />
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/departmentName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="国泰君安成都"
+                android:paddingRight="20dp"
+				android:layout_alignParentLeft="true"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/cmCountOfDepartment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="2dp"
+                android:layout_alignParentRight="true"
+                android:text=""
+                android:textColor="@color/main_color"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+        </RelativeLayout>
 
         <TextView
             android:id="@+id/departmentTel"
@@ -39,9 +58,9 @@
 
         <TextView
             android:id="@+id/departmentAddr"
-            android:layout_marginTop="3dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
             android:textColor="@color/gray"
             android:textSize="13sp" />
     </LinearLayout>

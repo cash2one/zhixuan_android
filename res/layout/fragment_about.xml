@@ -69,7 +69,7 @@
         android:paddingBottom="10dp"
         android:paddingLeft="20dp"
         android:paddingTop="10dp"
-        android:text="检查更新"
+        android:text="检查新版本"
         android:textSize="16sp" />
 
     <TextView

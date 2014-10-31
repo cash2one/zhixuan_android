@@ -45,19 +45,15 @@ import com.zhixuan.utils.ZXSharedPreferences;
 
 public class CustomManagerFragment extends Fragment {
 
-    private PullToRefreshListView mPullRefreshListView;
+    private ListView mCustomManagerListView;
     private CustomManagerListViewAdapter myAdapter;
-    private ListView actualListView;
     private RequestQueue mQueue;
-    private int currentPageCount = 1;
-    private Dialog loadingDialog;
     private String cityId;
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             myAdapter.clearAll();
-            currentPageCount = 1;
             GetData(1);
         }
     };
@@ -82,53 +78,14 @@ public class CustomManagerFragment extends Fragment {
             Bundle savedInstanceState) {
 
         mQueue = Volley.newRequestQueue(getActivity());
-        loadingDialog = LoadingDialog.createLoadingDialog(getActivity(),
-                "数据加载中...");
-        currentPageCount = 1;
 
         View view = inflater.inflate(R.layout.fragment_custom_manager,
                 container, false);
 
-        // mPullRefreshListView.setMode(com.handmark.pulltorefresh.library.PullToRefreshBase.Mode.BOTH);
-        mPullRefreshListView = (PullToRefreshListView) view
-                .findViewById(R.id.pull_refresh_cm_list);
-
-        mPullRefreshListView
-                .setOnRefreshListener(new OnRefreshListener<ListView>() {
-                    @Override
-                    public void onRefresh(
-                            PullToRefreshBase<ListView> refreshView) {
-                        String label = DateUtils.formatDateTime(getActivity(),
-                                System.currentTimeMillis(),
-                                DateUtils.FORMAT_SHOW_TIME
-                                        | DateUtils.FORMAT_SHOW_DATE
-                                        | DateUtils.FORMAT_ABBREV_ALL);
-
-                        // Update the LastUpdatedLabel
-                        refreshView.getLoadingLayoutProxy()
-                                .setLastUpdatedLabel(label);
-
-                        // Do work to refresh the list here.
-                        myAdapter.clearAll();
-                        currentPageCount = 1;
-                        GetData(1);
-                    }
-                });
-
-        mPullRefreshListView
-                .setOnLastItemVisibleListener(new OnLastItemVisibleListener() {
-
-                    @Override
-                    public void onLastItemVisible() {
-                        currentPageCount += 1;
-                        GetData(currentPageCount);
-                    }
-                });
-
-        actualListView = mPullRefreshListView.getRefreshableView();
+        mCustomManagerListView = (ListView) view.findViewById(R.id.lv_cm_list);
 
         myAdapter = new CustomManagerListViewAdapter();
-        actualListView.setAdapter(myAdapter);
+        mCustomManagerListView.setAdapter(myAdapter);
         GetData(1);
         return view;
     }
@@ -139,7 +96,9 @@ public class CustomManagerFragment extends Fragment {
                 getActivity());
         cityId = mZxSharedPreferences.getCityId();
 
-        loadingDialog.show();
+        if (cityId == "") {
+            return;
+        }
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                 Consts.MAIN_DOMAIN + "/kaihu/api_get_custom_manager_list?page="
@@ -147,10 +106,6 @@ public class CustomManagerFragment extends Fragment {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject obj) {
-                        // Log.d("TAG", obj.toString());
-
-                        loadingDialog.hide();
-
                         try {
 
                             if (obj.getInt("errcode") == 0) {
@@ -178,15 +133,11 @@ public class CustomManagerFragment extends Fragment {
                         }
 
                         myAdapter.notifyDataSetChanged();
-
-                        mPullRefreshListView.onRefreshComplete();
-
                     }
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.e("TAG", error.getMessage(), error);
-                        loadingDialog.hide();
                     }
                 });
 
@@ -240,12 +191,14 @@ public class CustomManagerFragment extends Fragment {
 
             imageLoader.get(strImageUrl, listener);
 
+            TextView companyName = (TextView) itemView.findViewById(R.id.cmCompanyName);
+            companyName.setText(strCompanyName);
             TextView info = (TextView) itemView.findViewById(R.id.cmInfo);
-            info.setText(strCompanyName + "     " + strInfo);
+            info.setText(strInfo);
             TextView tel = (TextView) itemView.findViewById(R.id.cmTel);
-            tel.setText("电话:   " + strTel);
+            tel.setText(strTel);
             TextView QQ = (TextView) itemView.findViewById(R.id.cmQQ);
-            QQ.setText("QQ:  " + strQQ);
+            QQ.setText(strQQ);
 
             return itemView;
         }
